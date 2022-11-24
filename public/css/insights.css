@@ -1,0 +1,20 @@
+body, button {
+    font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.flex-center {
+    display: flex; 
+    justify-content: center;
+}
+
+@media screen and (max-width: 500px) {
+    .hide-mobile {
+      display: none;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .hide-desktop {
+      display: none;
+    }
+}

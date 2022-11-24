@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Labs - Cool Stuff.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap" rel='stylesheet'>
+    <link href="./css/insights.css" rel='stylesheet'>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.6.1/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+    
+</head>
+<body>
+    <video autoplay muted loop id="myVideo" style="position: fixed;right: 0;bottom: 0;min-width: 100%;min-height: 100%;z-index: -10">
+        <source src="./img/bkg.mp4" type="video/mp4">
+    </video>
+    <div style="z-index: -9; position: fixed; right: 0; bottom: 0; min-height: 100%; min-width: 100%; background-color: #FFFFFF; opacity: 0.75;"></div>
+    <nav style="display: flex;justify-content: space-between;align-items: center">
+        <div>
+            <img alt="Text.png" src="./img/DeltaLabs.png" style="width: 164px; height: 39px; object-fit: cover;">
+            <img alt="Logo.png" src="./img/Logo.png" style="width: 52px; height: 55px; object-fit: cover;">
+        </div>
+        <div class="hide-mobile">
+            <h1 style="text-transform: uppercase; font-size: 2em">The Imitation Game</h1>
+        </div>
+        <div>
+            <button style="background-color: black; border-radius: 8px; color: white;padding: 0.4rem 1rem; border: 1px solid black; width: 120px; height: 40px; font-size: 16px; font-weight: 300">back</button>
+        </div>
+    </nav>
+    <div class="flex-center hide-desktop">
+        <h1 style="text-transform: uppercase; font-size: 2em">The Imitation Game</h1>
+    </div>
+    <div id="viz-container" style="width: 100%; height: 100vh"></div>
+</body>
+
+<script src="./js/imitation-game.js"></script>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "delta-labs-stories",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthiasschaller/delta-labs-stories.git"
+  },
+  "author": "Matthias Schaller",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matthiasschaller/delta-labs-stories/issues"
+  },
+  "homepage": "https://github.com/matthiasschaller/delta-labs-stories#readme",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.2"
+  }
+}
