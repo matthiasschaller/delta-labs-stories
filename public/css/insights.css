@@ -2,9 +2,29 @@ body, button {
     font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* box-shadow: rgba(33, 35, 38, 0.3) 0px 10px 10px -10px; */
+    background-color: white;
+}
+
 .flex-center {
     display: flex; 
     justify-content: center;
+}
+
+a {
+    background: transparent; 
+    border-radius: 8px; 
+    color: black !important;
+    text-decoration: none !important;
+    padding: 0.4rem 1rem; 
+    border: none; 
+    width: 120px; 
+    height: 40px; 
+    font-size: 16px
 }
 
 @media screen and (max-width: 500px) {
