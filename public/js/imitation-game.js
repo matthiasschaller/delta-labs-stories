@@ -3,7 +3,7 @@ let n = 100;
 let rectX = 20;
 let pad = 2;
 let duration = 1000;
-let delay = 5;
+let delay = 6;
 let counter = 0;
 
 let y1 = null;
@@ -11,14 +11,15 @@ let x1Max = 0;
 let y2 = null;
 let x2Max = 0;
 let mobile = false;
-let svg, data, width, height, scaleX, scaleY, lastIndex, lastIndexAnno;
+let svg, width, height, scaleX, scaleY, lastIndex;
+let data = [];
 let animationsArray = [];
 let vizIndex = [];
 let colors = ["#000000", "#FFFFFF"];
 let activeIndex = 0;
-let activeIndexAnno = 0;
 let setDuration = duration;
 let setDelay = delay;
+
 let sectionTexts = [
   "What are the consequences when we interact with machines that try to be human?",
   "We tested that. We designed one chatbot that communicated very machine-like. And we designed another chatbot that communicated very human-like by using emojis and other expressives.",
@@ -31,6 +32,9 @@ let sectionTexts = [
 (function () {
 
   const DotsToRect = function dotsToRect() {
+    removeAnnotation("1");
+    removeAnnotation("2");
+
     svg.selectAll(".bubble")
       .transition().duration(duration).delay((d, i) => i * delay).ease(d3.easeBack)
       .attr('r', radius.normal)
@@ -48,7 +52,7 @@ let sectionTexts = [
   width = svg.node().getBoundingClientRect().width;
   height = svg.node().getBoundingClientRect().height;
 
-  data = initData(n);
+  initData(n);
   scaleX = d3.scaleLinear().domain([0, 1]).range([50, width-50]);
   scaleY = d3.scaleLinear().domain([0, 1]).range([4*height/8, 6*height/8]);
 
@@ -73,29 +77,23 @@ let sectionTexts = [
     let sign = (activeIndex - lastIndex) < 0 ? -1 : 1;
     let scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
     scrolledSections.forEach(i => {
-      switch (i) {
-        case vizIndex[0]:
+        if (i == vizIndex[0]) {
           playAnimation(DotsToRect);
-          break;
-        case vizIndex[1]:
-          playAnimation([moveBubblesToLeft, moveBubblesToRight]);
-          break;
-        case vizIndex[2]:
-          playAnimation([moveBubblesToRight, MoveBubblesToLineHuman]);
-          break;
-        case vizIndex[3]:
-          playAnimation([MoveBubblesToLineHuman, MoveBubblesToLineMachine]);
-          break;
-        case vizIndex[4]:
-          playAnimation([RemoveEndRect, RemoveEndValues, MoveUp]);
-          break;
-        case vizIndex[5]: 
-          playAnimation([HighlightEnd, EndValues]);
-          break;
-        default: 
-          showText();
-          break;
-      }
+        } else if (i == vizIndex[1]) {
+          playAnimation([MoveBubblesToLeft, MoveBubblesToRight]);
+          playAnimation([Annotation1P1, Annotation2P1]);
+        } else if (i == vizIndex[2]) {
+          playAnimation([MoveBubblesToRight, MoveBubblesToLineHuman, Annotation1P2, Annotation2P1]);
+        } else if (i == vizIndex[3]) {
+          playAnimation([MoveBubblesToLineHuman, MoveBubblesToLineMachine, Annotation1P2, Annotation2P2]);
+        } else if (i == vizIndex[4]) {
+          playAnimation([RemoveEndRect, RemoveEndValues, MoveUp, Annotation1P3, Annotation2P3, resetAnimation1, resetAnimation2]);
+        } else if (i == vizIndex[5]) {
+          playAnimation([HighlightEnd, Annotation1P4, Annotation2P4]);  
+          playAnimation([EndValues]);
+        } else {
+            showText();
+        }
     })
     lastIndex = activeIndex;
   })
@@ -244,7 +242,7 @@ function createHTML() {
           d3.select("#section-" + counter).append("p").attr("id", "section-" + counter + "-p").style("font-size", "2.8em").text(sectionTexts[i]);
           counter = counter + 1;
           d3.select("#sections").append("div").attr("id", "section-" + counter).attr("class", "step viz").style("width", "100%").style("height", "100vh");
-          vizIndex[i] = counter;
+          vizIndex.push(counter);
           counter = counter + 1;
       }
       showText();
@@ -256,23 +254,24 @@ function createHTML() {
       for (var i = 0; i < sectionTexts.length; i++) {
           d3.select("#sections").append("section").attr("id", "section-" + i).attr("class", "step").style("height", "100vh").style("display", "flex").style("align-items", "center");;
           d3.select("#section-" + i).append("p").attr("id", "section-" + i + "-p").style("font-size", "1.8em").text(sectionTexts[i]);
-          vizIndex[i] = i;
+          vizIndex.push(i);
       }
       svg = d3.select("#viz").append("svg").attr("id", "viz-svg").style("width", "100%").style("height", "100%");
     }
 }
 
 function initData(n) {
-    let data = [];
-
     for (i = 0; i < n; i++) {
       data.push({ category: "humanlike", valueX: i/n, valueY: 0.5, color: colors[0], size: 1 });
       data.push({ category: "machinelike", valueX: i/n, valueY: i/n, color: colors[1], size: 1 });
     }
 
+    y1 = 0.5;
+    y2 = data[(2*n)-1].valueY;
+    x1Max = getMax("valueX", "humanlike");
+    x2Max = getMax("valueX", "machinelike");
     data.sort( () => .5 - Math.random() );
 
-    return (data);
 }
 
 function initDots() {
@@ -288,7 +287,23 @@ function initDots() {
     .attr("cy", -radius.normal)
 }
 
-function moveBubblesToLeft() {
+function calcBubblesX(sideX, side) {
+    let factor = 1;
+    if (side == "right") {
+        factor = 3;
+    }
+
+    let response = (factor*width/4) - radius.normal + (2*radius.normal+pad) * ((sideX%(rectX/2)) - (rectX/4))
+    return (response);
+}
+
+function calcBubblesY(sideY) {
+    let response = (2*height/8) + (Math.floor(sideY/(rectX/2)) * (2*radius.normal + pad))
+
+    return (response);
+}
+
+const MoveBubblesToLeft = function moveBubblesToLeft() {
   let sideX = 0;
   let sideY = 0;
 
@@ -296,12 +311,12 @@ function moveBubblesToLeft() {
     .transition().duration(duration).delay((d, i) => ((2*n)-i) * delay).ease(d3.easeBack)
     .attr('r', radius.normal)
     .attr('cy', function(d) {
-        let posY = (2*height/8) + (Math.floor(sideY/(rectX/2)) * (2*radius.normal + pad));
+        let posY = calcBubblesY(sideY);
         sideY = sideY + 1;
         return posY;
     })
     .attr('cx', function(d, i) {
-        let posX = (1*width/4) - radius.normal + (2*radius.normal+pad) * ((sideX%(rectX/2)) - (rectX/4));
+        let posX = calcBubblesX(sideX, "left");
         sideX = sideX + 1;
         return posX;
     })
@@ -313,7 +328,7 @@ function moveBubblesToLeft() {
     });
 }
 
-function moveBubblesToRight() {
+const MoveBubblesToRight = function moveBubblesToRight() {
   let sideX = 0;
   let sideY = 0;
 
@@ -321,12 +336,12 @@ function moveBubblesToRight() {
     .transition().duration(duration).delay((d, i) => ((2*n)-i) * delay).ease(d3.easeBack)
     .attr('r', radius.normal)
     .attr('cy', function(d) {
-        let posY = (2*height/8) + (Math.floor(sideY/(rectX/2)) * (2*radius.normal + pad));
+        let posY = calcBubblesY(sideY);
         sideY = sideY + 1;
         return posY;
     })
     .attr('cx', function(d, i) {
-        let posX = (3*width/4) - radius.normal + (2*radius.normal+pad) * ((sideX%(rectX/2)) - (rectX/4));
+        let posX = calcBubblesX(sideX, "right");
         sideX = sideX + 1;
         return posX;
     })
@@ -369,43 +384,93 @@ const MoveBubblesToLineHuman = function MoveBubblesToLineHuman() {
 }
 
 function initRectHighlight() {
-  data.forEach(d => {
-    if (d.category == "humanlike" && d.valueX > x1Max) {
-      y1 = d.valueY;
-      x1Max = d.valueX;
-    } else if (d.category == "machinelike" && d.valueX > x2Max) {
-      y2 = d.valueY;
-      x2Max = d.valueX;
-    }
-  });
+  let x = scaleX(x1Max) - radius.normal;
+  let y = scaleY(Math.min(y1, y2)) - radius.normal - (height/4);
+  let rectWidth = 2 * radius.normal;
+  let rectHeight = Math.abs(scaleY(y1) - scaleY(y2)) + (2 * radius.normal);
 
   svg.append("rect")
     .attr("id", "highlightRect")
-    .attr('x', scaleX(x1Max))
-    .attr('y', scaleY((y1 + y2) / 2))
-    .attr("transform","translate(0,-" + height/4 + ")")
+    .attr('x', scaleX(getMax("valueX")))
+    .attr('y', scaleY((y1 + y2) / 2) - height/4)
     .attr('width', 0)
     .attr('height', 0)
-    // .attr('stroke-width', '0.3')
-    // .attr('stroke', '#000000')
     .attr('fill', '#f0f0f0')
     .attr('fill-opacity', '0.5')
+
+  svg.append("line")
+    .attr("id", "highlightLineBottom")
+    .style("stroke", "black")
+    .style("stroke-width", 0.5)
+    .attr("x1", x + (rectWidth / 2))
+    .attr("x2", x + (rectWidth / 2))
+    .attr("y1", y + rectHeight)
+    .attr("y2", y + rectHeight)
+
+  svg.append("line")
+    .attr("id", "highlightLineTop")
+    .style("stroke", "black")
+    .style("stroke-width", 0.5)
+    .attr("x1", x + (rectWidth / 2))
+    .attr("x2", x + (rectWidth / 2))
+    .attr("y1", y)
+    .attr("y2", y)
+
+  svg.append("line")
+    .attr("id", "highlightLineRight")
+    .style("stroke", "black")
+    .style("stroke-width", 0.5)
+    .attr("x1", x)
+    .attr("x2", x)
+    .attr("y1", y + rectHeight)
+    .attr("y2", y + rectHeight)
+
+  svg.append("line")
+    .attr("id", "highlightLineLeft")
+    .style("stroke", "black")
+    .style("stroke-width", 0.5)
+    .attr("x1", x + rectWidth)
+    .attr("x2", x + rectWidth)
+    .attr("y1", y + rectHeight)
+    .attr("y2", y + rectHeight)
 }
 
 const HighlightEnd = function highlightEnd() {
+  let x = scaleX(x1Max) - radius.normal;
+  let y = scaleY(Math.min(y1, y2)) - radius.normal - (height/4);
+  let rectWidth = 2 * radius.normal;
+  let rectHeight = Math.abs(scaleY(y1) - scaleY(y2)) + (2 * radius.normal);
+
   svg.select("#highlightRect")
-    .transition().duration(duration).delay(300).ease(d3.easeExpOut)
-      .attr('x', scaleX(x1Max) - radius.normal)
-      .attr('y', scaleY(Math.min(y1, y2)) - radius.normal)
-      .attr('width', 2 * radius.normal)
-      .attr('height', Math.abs(scaleY(y1) - scaleY(y2)) + (2 * radius.normal))
+    .transition().duration(duration).delay(delay*50).ease(d3.easeExpOut)
+      .attr('x', x)
+      .attr('y', y)
+      .attr('width', rectWidth)
+      .attr('height', rectHeight)
+
+  svg.select("#highlightLineBottom")
+    .transition().duration(duration).delay(0).ease(d3.easeBack)
+      .attr("x1", x)
+      .attr("x2", x + rectWidth)
+
+  svg.select("#highlightLineLeft")
+    .transition().duration(duration).delay(duration).ease(d3.easeBack)
+        .attr("y1", y)
+
+  svg.select("#highlightLineRight")
+    .transition().duration(duration).delay(duration).ease(d3.easeBack)
+      .attr("y1", y)
+
+  svg.select("#highlightLineTop")
+    .transition().duration(duration).delay(2*duration).ease(d3.easeBack)
+      .attr("x1", x)
+      .attr("x2", x + rectWidth)
       .on("end", function() {
         onEndAnimation();
-      })
+      });
 }
 
 const MoveUp = function moveUp() {
-  if (svg.select(".moveElement").attr("transform") == "translate(0,0)" || svg.select(".moveElement").attr("transform") == "") {
     svg.selectAll(".moveElement")
     .transition().duration(duration).delay((d, i) => i * delay).ease(d3.easeBack)
       .attr("transform","translate(0,-" + height/4 + ")")
@@ -415,57 +480,22 @@ const MoveUp = function moveUp() {
           onEndAnimation();
         }
       });
-  } else {
-    onEndAnimation();
-  }
 }
 
 const EndValues = function endValues() {
-  let annotationType = d3.annotationCalloutElbow;
+
   let x = scaleX(getMax("valueX")) - (width/4);
   let y = scaleY(getMax("valueY")) + radius.normal - (height/4);
-
-  let nx = scaleX(getMax("valueX"))-(width/4);
-  if (mobile) {
-    annotationType = d3.annotationCallout;
-    x = width-100
-    nx = width-100;
-  }
-
-  const annotations = [{
-    note: {
-      label: "machinelike interaction",
-      title: "10%"
-    },
-    x: scaleX(getMax("valueX")),
-    y: y,
-    ny: y + 30,
-    nx: nx
-  }, {
-    note: {
-      label: "humanlike interaction",
-      title: "40%"
-    },
-    x: scaleX(getMax("valueX")),
-    y: y + 5,
-    ny: y + 120,
-    nx: nx-10
-  }];
-
-  const makeAnnotations = d3.annotation().type(annotationType).annotations(annotations);
-  if (svg.selectAll("#annotation-delta").size() == 0) {
-    svg.append("g").attr("class", "annotation-group").attr("id", "annotation-delta").call(makeAnnotations)
-  }
 
   if (svg.selectAll("#delta-logo").size() == 0) {
     svg.append("svg:image")
       .attr("id", "delta-logo")
-      .attr('x', x - 250)
-      .attr('y', y + 70)
+      .attr('x', x - 180)
+      .attr('y', y + 60)
       .attr('width', 0)
       .attr('height', 0)
       .attr("xlink:href", "./img/Logo.png")
-      .transition().delay(0).duration(300).ease(d3.easeExpOut)
+      .transition().delay(0).duration(duration/3).ease(d3.easeExpOut)
         .attr('width', 45)
         .attr('height', 48)
   }
@@ -473,11 +503,11 @@ const EndValues = function endValues() {
   if (svg.selectAll("#delta-text").size() == 0) {
     svg.append("text")
       .attr("id", "delta-text")
-      .attr("x", x - 252)
-      .attr("y", y + 130)
+      .attr("x", x - 185)
+      .attr("y", y + 120)
       .style("font-size", "0px")
       .text("DELTA")
-      .transition().delay(200).duration(300).ease(d3.easeExpOut)
+      .transition().delay(delay*50).duration(duration/3).ease(d3.easeExpOut)
         .style("font-size", "19px")
       
   }
@@ -485,11 +515,11 @@ const EndValues = function endValues() {
   if (svg.selectAll("#diff-text").size() == 0) {
     svg.append("text")
       .attr("id", "diff-text")
-      .attr("x", x - 190)
-      .attr("y", y + 110)
+      .attr("x", x - 120)
+      .attr("y", y + 100)
       .style("font-size", "0px")
       .text("40%")
-      .transition().delay(400).duration(300).ease(d3.easeExpOut)
+      .transition().delay(delay*50).duration(duration/3).ease(d3.easeExpOut)
         .style("font-size", "34px")
         .on("end", function() {
             onEndAnimation();
@@ -509,6 +539,12 @@ const RemoveEndValues = function removeEndValues() {
 }
 
 const RemoveEndRect = function removeEndRect() {
+  let x = scaleX(x1Max) - radius.normal;
+  let y = scaleY(Math.min(y1, y2)) - radius.normal - (height/4);
+  let rectWidth = 2 * radius.normal;
+  let rectHeight = Math.abs(scaleY(y1) - scaleY(y2)) + (2 * radius.normal);
+
+
   svg.select("#highlightRect")
     .transition().duration(duration).delay(0).ease(d3.easeExpOut)
     .attr('x', scaleX(x1Max))
@@ -518,16 +554,311 @@ const RemoveEndRect = function removeEndRect() {
     .on("end", function() {
       onEndAnimation();
     });
+
+  svg.select("#highlightLineBottom")
+    .transition().duration(duration).delay(0).ease(d3.easeExpOut)
+      .attr("x1", x + (rectWidth / 2))
+      .attr("x2", x + (rectWidth / 2))
+      .attr("y1", y + rectHeight)
+      .attr("y2", y + rectHeight)
+
+  svg.select("#highlightLineTop")
+    .transition().duration(duration).delay(0).ease(d3.easeExpOut)
+      .attr("x1", x + (rectWidth / 2))
+      .attr("x2", x + (rectWidth / 2))
+      .attr("y1", y)
+      .attr("y2", y)
+
+  svg.select("#highlightLineRight")
+    .transition().duration(duration).delay(0).ease(d3.easeExpOut)
+      .attr("x1", x)
+      .attr("x2", x)
+      .attr("y1", y + rectHeight)
+      .attr("y2", y + rectHeight)
+
+  svg.select("#highlightLineLeft")
+    .transition().duration(duration).delay(0).ease(d3.easeExpOut)
+      .attr("x1", x + rectWidth)
+      .attr("x2", x + rectWidth)
+      .attr("y1", y + rectHeight)
+      .attr("y2", y + rectHeight)
 }
 
-function getMax(el) {
-  let max = null;
+function getMax(el, category) {
+    let max = null;
 
-  data.forEach(d => {
-    if (d[el] > max) {
-      max = d[el];
+    if (category) {
+        data.forEach(d => {
+            if (d.category == category && d[el] > max) {
+              max = d[el];
+            }
+        });
+    } else {
+        data.forEach(d => {
+            if (d[el] > max) {
+              max = d[el];
+            }
+        });
     }
-  });
 
-  return (max);
+    return (max)
 }
+
+function getMin(el, category) {
+    let min = 0;
+
+    data.forEach(d => {
+        if (d.category == category && d[el] < min) {
+          min = d[el];
+        }
+    });
+
+    return (min)
+}
+
+/////////////////////////////////////////////////////////////////////
+// ANNOTATION SECTION
+/////////////////////////////////////////////////////////////////////
+let fontSize = 16;
+let lineWidth = 100;
+let dxdy = { 
+  "1": {"x": 30, "y": 30},
+  "2": {"x": -30, "y": 30} 
+};
+
+function generateAnnotationLineWidth(id) {
+  let thisLineWidth = lineWidth;
+  if (dxdy[id].x < 0) {
+    thisLineWidth = -thisLineWidth;
+  }
+
+  return thisLineWidth;
+}
+
+function addAnnotation(x, y, title, label, id, showLabel) {
+  thisLineWidth = generateAnnotationLineWidth(id);
+
+  if (svg.select("#annotation-" + id).size() == 0) {
+    let annotation = svg.append("g").attr("id", "annotation-" + id);
+    annotation.append("line")
+      .attr("id", "annotation-" + id + "-connector")
+      .style("stroke", "black")
+      .style("stroke-width", 1)
+      .attr("x1", x)
+      .attr("y1", y)
+      .attr("x2", x)
+      .attr("y2", y);
+  
+    annotation.append("line")
+      .attr("id", "annotation-" + id + "-line")
+      .style("stroke", "black")
+      .style("stroke-width", 1)
+      .attr("x1", x + dxdy[id].x)
+      .attr("y1", y + dxdy[id].y)
+      .attr("x2", x + dxdy[id].x)
+      .attr("y2", y + dxdy[id].y);
+  
+    annotation.append("text")
+      .attr("id", "annotation-" + id + "-title")
+      .style("font-size", "0px")
+      .style("font-weight", "bold")
+      .attr("alignment-baseline", "hanging")
+      .text(title);
+  
+    annotation.append("text")
+      .attr("id", "annotation-" + id + "-label")
+      .attr("alignment-baseline", "ideographic")
+      .style("font-size", "0px")
+      .text(label);
+    
+
+    d3.select("#annotation-" + id + "-title")
+      .attr("x", x +  dxdy[id].x + Math.min(thisLineWidth, 0))
+      .attr("y", y +  dxdy[id].y + 5)
+
+    d3.select("#annotation-" + id + "-label")
+      .attr("x", x + dxdy[id].x + Math.min(thisLineWidth, 0))
+      .attr("y", y + dxdy[id].y + fontSize + 5)
+      
+      standardLayoutAnnotation(id, showLabel);
+
+  } else {
+    let x1 = d3.select("#annotation-" + id + "-connector").attr("x1");
+    let y1 = d3.select("#annotation-" + id + "-connector").attr("y1");
+    let transform = [x1, y1];
+  
+    let translateX = x - transform[0];
+    let translateY = y - transform[1];
+
+    d3.select("#annotation-" + id)
+      .transition().duration(duration).delay(0).ease(d3.easeBack)
+      .attr("transform", "translate(" + translateX+ ", " + translateY + ")")
+      .on("end", function() {
+        standardLayoutAnnotation(id, showLabel);
+      });  
+  }
+
+}
+
+function moveAnnotation(id, x, y) {
+  let x1 = d3.select("#annotation-" + id + "-connector").attr("x1");
+  let y1 = d3.select("#annotation-" + id + "-connector").attr("y1");
+  let transform = [x1, y1];
+
+  let translateX = x - transform[0];
+  let translateY = y - transform[1];
+
+  d3.select("#annotation-" + id)
+    .transition().duration(duration).delay(delay*50).ease(d3.easeBack)
+    .attr("transform", "translate(" + translateX+ ", " + translateY + ")")
+    .on("end", function() {
+      onEndAnimation();
+    });    
+}
+
+function standardLayoutAnnotation(id, showLabel) {
+  let x = Number(d3.select("#annotation-" + id + "-connector").attr("x1"));
+  let y = Number(d3.select("#annotation-" + id + "-connector").attr("y1"));
+
+  thisLineWidth = generateAnnotationLineWidth(id);
+  let stepDuration = duration/3;
+
+  svg.select("#annotation-" + id + "-line")
+    .transition().duration(stepDuration).delay(stepDuration).ease(d3.easeBack)
+      .attr("x1", x + dxdy[id].x)
+      .attr("y1", y + dxdy[id].y)
+      .attr("x2", x + dxdy[id].x + thisLineWidth)
+      .attr("y2", y + dxdy[id].y);
+
+  svg.select("#annotation-" + id + "-connector")
+    .transition().duration(stepDuration).delay(stepDuration).ease(d3.easeBack)
+      .attr("x1", x)
+      .attr("y1", y)
+      .attr("x2", x + dxdy[id].x)
+      .attr("y2", y + dxdy[id].y);
+
+  svg.select("#annotation-" + id + "-title")
+    .transition().duration(stepDuration).delay(2*stepDuration).ease(d3.easeBack)
+    .style("font-size", fontSize + "px")
+    .attr("x", x +  dxdy[id].x + Math.min(thisLineWidth, 0))
+    .attr("y", y +  dxdy[id].y + 5)
+    .on("end", function() {
+      onEndAnimation();
+    });
+
+  if (showLabel) {
+    svg.select("#annotation-" + id + "-label")  
+      .transition().duration(stepDuration).delay(2*stepDuration).ease(d3.easeBack)
+      .attr("x", x +  dxdy[id].x + Math.min(thisLineWidth, 0))
+      .attr("y", y +  dxdy[id].y + 5 + fontSize)
+      .style("font-size", fontSize + "px")
+  } else {
+    svg.select("#annotation-" + id + "-label")  
+      .transition().duration(stepDuration).delay(2*stepDuration).ease(d3.easeBack)
+      .attr("x", x +  dxdy[id].x + Math.min(thisLineWidth, 0))
+      .attr("y", y +  dxdy[id].y + 5 + fontSize)
+      .style("font-size", "0px")
+  }
+}
+
+function expandAnnotation(id, top) {
+  let connectorLength = 50;
+  let offSet = 0;
+  if (!top) {
+    connectorLength = 120;
+    offSet = 10;
+  }
+
+  let yLine = scaleY(getMax("valueY", "machinelike")) + radius.normal + connectorLength - (height/4);
+  let xEdge = scaleX((n-1) / n) - radius.small - pad - connectorLength;
+  let xEnd = scaleX(getMax("valueX")) - (width/4);
+
+  svg.select("#annotation-" + id)
+    .transition().duration(duration).delay(delay*50).ease(d3.easeBack)
+    .attr("transform", "translate(0,0)");
+
+  svg.select("#annotation-" + id + "-connector")
+    .transition().duration(duration).delay(delay*50).ease(d3.easeBack)
+    .attr("x1", scaleX((n-1) / n) - radius.small - pad)
+    .attr("y1", yLine - connectorLength + offSet)
+    .attr("x2", xEdge)
+    .attr("y2", yLine + offSet)
+
+  svg.select("#annotation-" + id + "-title")
+    .transition().duration(duration).delay(delay*50).ease(d3.easeBack)
+      .attr("x", xEnd)
+      .attr("y", yLine + offSet + 5)
+      .transition().duration(duration).delay(delay*50).ease(d3.easeBack)
+        .attr("font-weight", "normal")
+        .on("end", function() {
+            onEndAnimation();
+        });
+
+  svg.select("#annotation-" + id + "-label")
+    .attr("x", xEnd)
+    .attr("y", yLine + offSet)
+    .transition().duration(duration).delay((delay*70) + duration).ease(d3.easeBack)
+      .style("font-size", fontSize + "px")
+
+  svg.select("#annotation-" + id + "-line")
+    .transition().duration(duration).delay(delay*50).ease(d3.easeBack)
+    .attr("x1", xEdge)
+    .attr("y1", yLine + offSet)
+    .attr("x2", xEnd)
+    .attr("y2", yLine + offSet)
+
+}
+
+function removeAnnotation(id) {
+  d3.select("#annotation-" + id).remove();
+}
+
+const Annotation1P1 = function annotation1P1() {
+    let x = calcBubblesX(0, "left") + radius.normal + pad;
+    let y = calcBubblesY(n-1, "left") + radius.normal + pad;
+    addAnnotation(x, y, "machinelike", "50% Lorem Ipsum", "1", false);
+}
+
+const Annotation2P1 = function annotation2P1() {
+    let x = calcBubblesX(n-1, "right") - radius.normal - pad;
+    let y = calcBubblesY(n-1, "right") + radius.normal + pad;
+    addAnnotation(x, y, "humanlike", "0% Lorem Ipsum", "2", false);
+}
+
+const Annotation1P2 = function annotation1P2() {
+    moveAnnotation("1", scaleX(0) + radius.small + pad, scaleY(0.5) + radius.small + pad)
+}
+
+const Annotation2P2 = function annotation2P2() {
+    moveAnnotation("2", scaleX((n-1) / n) - radius.small - pad, scaleY(1) + radius.small + pad)
+}
+
+const Annotation1P3 = function annotation1P3() {
+    moveAnnotation("1", scaleX(0) + radius.small + pad, scaleY(0.5) + radius.small + pad - (height/4))
+}
+
+const Annotation2P3 = function annotation2P3() {
+    moveAnnotation("2", scaleX((n-1) / n) - radius.small - pad, scaleY(1) + radius.small + pad - (height/4))
+}
+
+const resetAnimation1 = function resetAnimation1() {
+  standardLayoutAnnotation("1", false)
+}
+
+const resetAnimation2 = function resetAnimation1() {
+  standardLayoutAnnotation("2", false)
+}
+
+const Annotation1P4 = function annotation1P4() {
+  expandAnnotation("1", false);
+}
+
+const Annotation2P4 = function annotation2P4() {
+    expandAnnotation("2", true);
+}
+
+//   if (mobile) {
+//     annotationType = d3.annotationCallout;
+//     x = width-100
+//     nx = width-100;
+//   }

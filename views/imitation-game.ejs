@@ -19,8 +19,8 @@
     <div style="z-index: -9; position: fixed; right: 0; bottom: 0; min-height: 100%; min-width: 100%; background-color: #FFFFFF; opacity: 0.75;"></div>
     <nav>
         <div>
-            <img alt="Text.png" src="./img/DeltaLabs.png" style="width: 164px; height: 39px; object-fit: cover;">
-            <img alt="Logo.png" src="./img/Logo.png" style="width: 52px; height: 55px; object-fit: cover;">
+            <img alt="Text.png" src="./img/DeltaLabsLarge.png" style="width: 164px; height: 39px">
+            <img alt="Logo.png" src="./img/LogoLarge.png" style="width: 52px; height: 55px">
         </div>
         <div class="hide-mobile">
             <h1 style="text-transform: uppercase; font-size: 2em">The Imitation Game</h1>
@@ -36,4 +36,9 @@
 </body>
 
 <script src="./js/imitation-game.js"></script>
+<script>
+    window.onbeforeunload = function () {
+        window.scrollTo(0, 0);
+    }
+</script>
 </html>
