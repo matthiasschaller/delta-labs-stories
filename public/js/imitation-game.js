@@ -1,4 +1,4 @@
-let radius = { "normal": 12, "small": 4 };
+let radius = { "normal": 8, "small": 4 };
 let n = 100;
 let rectX = 20;
 let pad = 2;
@@ -30,7 +30,6 @@ let sectionTexts = [
 ];
 
 (function () {
-
   const DotsToRect = function dotsToRect() {
     removeAnnotation("1");
     removeAnnotation("2");
@@ -39,7 +38,7 @@ let sectionTexts = [
       .transition().duration(duration).delay((d, i) => i * delay).ease(d3.easeBack)
       .attr('r', radius.normal)
       .attr('cx', (d, i) => (width/2) - radius.normal + (2*radius.normal+pad) * ((i%rectX) - (rectX/2)))
-      .attr('cy', (d, i) => (height/8) + (Math.floor(i/rectX) * (2*radius.normal + pad)))
+      .attr('cy', (d, i) => (2*height/8) + (Math.floor(i/rectX) * (2*radius.normal + pad)))
       .on("end", function(d, i) {
         let nEls = svg.selectAll(".bubble").size();
         if (i >= (nEls - 1)) {
@@ -51,10 +50,11 @@ let sectionTexts = [
   createHTML();
   width = svg.node().getBoundingClientRect().width;
   height = svg.node().getBoundingClientRect().height;
+  radius.normal = Math.round(width / 100);
 
   initData(n);
   scaleX = d3.scaleLinear().domain([0, 1]).range([50, width-50]);
-  scaleY = d3.scaleLinear().domain([0, 1]).range([4*height/8, 6*height/8]);
+  scaleY = d3.scaleLinear().domain([0, 1]).range([5*height/8, 7*height/8]);
 
   initDots();
   initRectHighlight();
@@ -204,6 +204,7 @@ function scroller(className){
       let pos = window.pageYOffset - 300 - containerStart;
       let sectionIndex = d3.bisect(sectionPositions, pos);
       sectionIndex = Math.min(sections.size()-1, sectionIndex);
+
       if (currentIndex !== sectionIndex){
         dispatch.call('active', this, sectionIndex);
         currentIndex = sectionIndex;
@@ -239,17 +240,17 @@ function createHTML() {
       let counter = 0;
       for (var i = 0; i < sectionTexts.length; i++) {
           d3.select("#sections").append("section").attr("id", "section-" + counter).attr("class", "step text").style("height", "100vh").style("display", "flex").style("align-items", "center");
-          d3.select("#section-" + counter).append("p").attr("id", "section-" + counter + "-p").style("font-size", "2.8em").text(sectionTexts[i]);
+          d3.select("#section-" + counter).append("p").attr("id", "section-" + counter + "-p").style("font-size", "2.5em").text(sectionTexts[i]);
           counter = counter + 1;
           d3.select("#sections").append("div").attr("id", "section-" + counter).attr("class", "step viz").style("width", "100%").style("height", "100vh");
           vizIndex.push(counter);
           counter = counter + 1;
       }
       showText();
-      svg = d3.select("#viz").append("svg").attr("id", "viz-svg").style("width", "100%").style("height", "100%");
+      svg = d3.select("#viz").append("svg").attr("id", "viz-svg").style("width", "100%").style("height", "100%").style("top", "0").style("position", "fixed");
     } else {
       d3.select("#viz-container").append("div").attr("id", "sections").style("width", "30%").style("height", "100%");
-      d3.select("#viz-container").append("div").attr("id", "viz").style("width", "70%").style("height", "100%").style("position", "fixed").style("right", "0");
+      d3.select("#viz-container").append("div").attr("id", "viz").style("width", "70%").style("height", "100%").style("position", "fixed").style("right", "0").style("top", "0");
       
       for (var i = 0; i < sectionTexts.length; i++) {
           d3.select("#sections").append("section").attr("id", "section-" + i).attr("class", "step").style("height", "100vh").style("display", "flex").style("align-items", "center");;
@@ -298,7 +299,7 @@ function calcBubblesX(sideX, side) {
 }
 
 function calcBubblesY(sideY) {
-    let response = (2*height/8) + (Math.floor(sideY/(rectX/2)) * (2*radius.normal + pad))
+    let response = (3*height/8) + (Math.floor(sideY/(rectX/2)) * (2*radius.normal + pad))
 
     return (response);
 }

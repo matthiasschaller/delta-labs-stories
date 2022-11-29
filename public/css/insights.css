@@ -1,13 +1,29 @@
+html {
+    scroll-behavior: smooth;
+}
+
 body, button {
     font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
+    
 }
 
 nav {
     display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     justify-content: space-between;
     align-items: center;
     /* box-shadow: rgba(33, 35, 38, 0.3) 0px 10px 10px -10px; */
     background-color: white;
+    padding:10px;
+    z-index:10;
+}
+
+.nav-title {
+    text-transform: uppercase; 
+    font-size: 2em
 }
 
 .flex-center {
@@ -36,6 +52,9 @@ a:hover {
 @media screen and (max-width: 500px) {
     .hide-mobile {
       display: none;
+    }
+    .nav-title {
+        font-size: 1rem;
     }
 }
 
