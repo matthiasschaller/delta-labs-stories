@@ -486,7 +486,13 @@ const MoveUp = function moveUp() {
 const EndValues = function endValues() {
 
   let x = scaleX(getMax("valueX")) - (width/4);
+  // if (mobile) {
+  //   x = scaleX(getMax("valueX")) - (3*width/4);
+  // }
   let y = scaleY(getMax("valueY")) + radius.normal - (height/4);
+  if (mobile) {
+    y = scaleY(getMax("valueY")) + radius.normal - (height/8);
+  }
 
   if (svg.selectAll("#delta-logo").size() == 0) {
     svg.append("svg:image")
@@ -773,6 +779,9 @@ function expandAnnotation(id, top) {
   let yLine = scaleY(getMax("valueY", "machinelike")) + radius.normal + connectorLength - (height/4);
   let xEdge = scaleX((n-1) / n) - radius.small - pad - connectorLength;
   let xEnd = scaleX(getMax("valueX")) - (width/4);
+  if (mobile) {
+    xEnd = scaleX(0)-10;
+  }
 
   svg.select("#annotation-" + id)
     .transition().duration(duration).delay(delay*50).ease(d3.easeBack)

@@ -12,6 +12,10 @@ app.get("/imitation-game", function (req, res) {
     res.render("imitation-game");
 });
 
+app.get("/privacy-paradox", function (req, res) {
+    res.render("privacy-paradox");
+});
+
 
 const PORT = process.env.PORT || 8080;
 
