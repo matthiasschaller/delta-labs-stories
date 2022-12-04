@@ -12,10 +12,16 @@ app.get("/imitation-game", function (req, res) {
     res.render("imitation-game");
 });
 
+app.get("/insights-template-snap", function (req, res) {
+    let sections = ["Section 0 - Setup", "Section 1 - Demographics", "Section 2 - Attitudes", "Section 3 - Wordcloud", "Section 4 - Massnahmen", "Section 5 - Simple Bars", "Section 6 - Rank Order"];
+
+    res.render("insights-template",  { title: "The Insights Template", sections: sections, scrollSnap: true });
+});
+
 app.get("/insights-template", function (req, res) {
     let sections = ["Section 0 - Setup", "Section 1 - Demographics", "Section 2 - Attitudes", "Section 3 - Wordcloud", "Section 4 - Massnahmen", "Section 5 - Simple Bars", "Section 6 - Rank Order"];
 
-    res.render("insights-template",  { title: "The Insights Template", sections: sections });
+    res.render("insights-template",  { title: "The Insights Template", sections: sections, scrollSnap: false });
 });
 
 app.get("/privacy-paradox", function (req, res) {
@@ -23,7 +29,6 @@ app.get("/privacy-paradox", function (req, res) {
 
     res.render("privacy-paradox",  { title: "The Privacy Paradox", sections: sections });
 });
-
 
 const PORT = process.env.PORT || 8080;
 

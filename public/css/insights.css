@@ -1,6 +1,9 @@
 body, button {
     font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif;
-    
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 nav {
@@ -26,7 +29,7 @@ nav {
     justify-content: center;
 }
 
-a {
+a.insights-btn {
     background: transparent; 
     border-radius: 8px; 
     color: black;
@@ -39,7 +42,7 @@ a {
     transition: all 0.3s ease-out;
 }
 
-a:hover {
+a.insights-btn:hover {
     color: white;
     background: black;
 }
