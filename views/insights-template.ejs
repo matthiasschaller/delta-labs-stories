@@ -56,7 +56,15 @@
     }
 
     let scrollSnap = <%= scrollSnap %>;
+    let navigationTooltips =  <%- JSON.stringify(navigationTooltips) %>
+    let mobile = false;
+    let svg, width, height, navHeight;
 </script>
 
 <script src="./js/insights.js"></script>
+<% if (scripts && scripts.length > 0) { %>
+    <% scripts.forEach(script => { %>
+        <script src="./js/<%= scriptFolder %>/<%= script %>.js"></script>
+    <% }) %>
+<% } %>
 </html>

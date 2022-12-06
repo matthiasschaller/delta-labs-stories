@@ -9,7 +9,22 @@ app.get("/", function (req, res) {
 });
 
 app.get("/imitation-game", function (req, res) {
-    res.render("imitation-game");
+    let sections = [
+        "What are the consequences when we interact with machines that try to be human?",
+        "We tested that. We designed one chatbot that communicated very machine-like. And we designed another chatbot that communicated very human-like by using emojis and other expressives.",
+        "People that chatted with our human-like chatbot were less interested in a personal follow-up consultation. That is, their need for personal interaction was satisfied by the chatbot.",
+        "People that chatted with our machine-like chatbot were still interested in a personal follow-up consultation. The interaction with the chatbot could not satisfy their need for personal interaction.",
+        "People that chatted with our machine-like chatbot were still interested in a personal follow-up consultation. The interaction with the chatbot could not satisfy their need for personal interaction."
+    ];
+
+    res.render("insights-template", { 
+        title: "The Imitation Game", 
+        sections: sections, 
+        scrollSnap: true, 
+        scriptFolder: "imitation-game", 
+        scripts: ["imitation-helpers", "imitation-annotations", "imitation-game"],
+        navigationTooltips: [] 
+    });
 });
 
 app.get("/insights-template-snap", function (req, res) {

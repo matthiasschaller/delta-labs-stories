@@ -1,6 +1,6 @@
-let svg, width, height, nav, navHeight, nSections; 
-let mobile = false;
+let nav, nSections; 
 let scrollPosition = 0;
+let scrollOrigin = 0;
 let margin = 8;
 
 (function () {
@@ -19,21 +19,36 @@ let margin = 8;
     }, 500);
 
     if (scrollSnap) {
-        new fullpage('#left-container', {
+        let settings = {
+            licenseKey: "KHZH6-CTH47-C4KG8-7JT37-ZQRML",
             autoScrolling:true,
             scrollHorizontally: false,
-            navigation: true,
+            navigation: false,
             scrollOverflow: false,
-            onLeave: function(origin, destination, direction, trigger){
+            navigationTooltips: navigationTooltips,
+            showActiveTooltip: true,
+            credits: { enabled: false, label: '', position: 'right'},
+            scrollingSpeed: 1000,
+            beforeLeave: function(origin, destination, direction, trigger){
                 scrollPosition = destination.index;
-                d3.select("#scroll-text").text("Section: " + Math.floor(scrollPosition));
+                scrollOrigin = origin.index;
                 if (destination.index == 0) {
                     showNavbar();
                 } else {
                     hideNavbar();
                 }
+
+                if (mobile) {
+                    fadeScroll();
+                }
             }
-        });
+        }
+
+        if (mobile) {
+            settings.navigation = false;
+        }
+
+        new fullpage('#left-container', settings);
     } else {
         window.addEventListener('scroll', function(e){ 
             if (this.window.scrollY == 0) {
@@ -65,7 +80,7 @@ function checkMobile() {
         document.querySelector("#viz-svg").classList.add("mobile");
         for (const step of document.querySelectorAll(".step-p")) {
             step.classList.add('mobile');
-            step.style.marginTop = navHeight + "px";
+            step.style.marginTop = navHeight + 10 + "px";
         }
         for (const step of document.querySelectorAll(".step")) {
             step.style.alignItems = "flex-start";
@@ -82,14 +97,26 @@ function checkMobile() {
     }
 }
 
+function fadeScroll() {
+    for (const step of document.querySelectorAll(".step-p")) {
+        step.style.opacity = 0;
+    }
+
+    setTimeout(function() {
+        document.querySelector("#section-" + scrollPosition + "-p").style.opacity = 1;
+    }, 400);
+}
+
 function showNavbar() {
     nav.style.top = "0px";
     nav.style.opacity = 1;
 }
 
 function hideNavbar() {
-    nav.style.top = -navHeight + "px";
-    nav.style.opacity = 0;
+    if (false) {
+        nav.style.top = -navHeight + "px";
+        nav.style.opacity = 0;
+    }
 }
 
 function calculateScrollPosition() {
