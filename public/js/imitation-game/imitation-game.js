@@ -26,16 +26,16 @@ if (mobile) {
 
   initData(n);
   radius.normal = Math.round(width / 100);
-  scaleX = d3.scaleLinear().domain([0, 1]).range([100, width-150]);
+  scaleX = d3.scaleLinear().domain([0, 1]).range([100, width-100]);
   if (mobile) {
     scaleX = d3.scaleLinear().domain([0, 1]).range([50, width-50]);
   }
-  scaleY = d3.scaleLinear().domain([0, 1]).range([5*height/8, 7*height/8]);
+  scaleY = d3.scaleLinear().domain([1, 0]).range([5*height/8, 7*height/8]);
 
   initDots();
   initRectHighlight();
-  initAnnotation("1", "machinelike", "50% Lorem Ipsum");
-  initAnnotation("2", "humanlike", "0% Lorem Ipsum");
+  initAnnotation("1", "humanlike", "50% Lorem Ipsum");
+  initAnnotation("2", "machinelike", "0% Lorem Ipsum");
   dotsToRect();
 
 }());
@@ -56,16 +56,16 @@ function scroll(scrollPosition) {
     moveAnnotationToStart("2");
 
     moveBubblesToLineHuman();
-    moveAnnotation("1", scaleX(0) + radius.small + pad, scaleY(0.5) + radius.small + pad);
+    moveAnnotation("1", scaleX((n-1) / n) - radius.small - pad, scaleY(0.5) + radius.small + pad);
   } else if (scrollPosition == 3) {
     removeEndRect();
     removeEndValues();
 
     moveBubblesToLineHuman();
-    moveAnnotation("1", scaleX(0) + radius.small + pad, scaleY(0.5) + radius.small + pad - (height/moveUpFactor));
+    moveAnnotation("1", scaleX((n-1) / n) - radius.small - pad, scaleY(0.5) + radius.small + pad - (height/moveUpFactor));
 
     moveBubblesToLineMachine();
-    moveAnnotation("2", scaleX((n-1) / n) - radius.small - pad, scaleY(1) + radius.small + pad - (height/moveUpFactor));
+    moveAnnotation("2", scaleX(0) + radius.small + pad, scaleY(0) + radius.small + pad - (height/moveUpFactor));
 
     standardLayoutAnnotation("1", false, false);
     standardLayoutAnnotation("2", false, false);
@@ -111,7 +111,7 @@ function initDots() {
 
 function initRectHighlight() {
   let x = scaleX(x1Max) - radius.normal;
-  let y = scaleY(Math.min(y1, y2)) - radius.normal - (height/moveUpFactor);
+  let y = scaleY(Math.max(y1, y2)) - radius.normal - (height/moveUpFactor);
   let rectWidth = 2 * radius.normal;
   let rectHeight = Math.abs(scaleY(y1) - scaleY(y2)) + (2 * radius.normal);
 
@@ -170,13 +170,7 @@ function dotsToRect() {
     .attr("transform","translate(0,0)")
     .attr('r', radius.normal)
     .attr('cx', (d, i) => (width/2) - radius.normal + (2*radius.normal+pad) * ((i%rectX) - (rectX/2)))
-    .attr('cy', (d, i) => (navHeight + radius.normal) + (Math.floor(i/rectX) * (2*radius.normal + pad)))
-    .on("end", function(d, i) {
-      let nEls = svg.selectAll(".bubble").size();
-      if (i >= (nEls - 1)) {
-
-      }
-    });
+    .attr('cy', (d, i) => (navHeight + radius.normal) + (height / 8) + (Math.floor(i/rectX) * (2*radius.normal + pad)))
 }
 
 ////////////////////////////////////////////////////////////////
@@ -260,7 +254,7 @@ function removeEndValues() {
 
 function removeEndRect() {
   let x = scaleX(x1Max) - radius.normal;
-  let y = scaleY(Math.min(y1, y2)) - radius.normal - (height/moveUpFactor);
+  let y = scaleY(Math.max(y1, y2)) - radius.normal - (height/moveUpFactor);
   let rectWidth = 2 * radius.normal;
   let rectHeight = Math.abs(scaleY(y1) - scaleY(y2)) + (2 * radius.normal);
 
@@ -305,11 +299,11 @@ function removeEndRect() {
 // STEP 4
 ////////////////////////////////////////////////////////////////
 function endValues() {
-
   let x = scaleX(getMax("valueX")) - (width/4);
-  let y = scaleY(getMax("valueY")) + radius.normal - (height/moveUpFactor);
+  let y = scaleY(0.5) + radius.normal - (height/moveUpFactor);
   if (mobile) {
-    y = scaleY(getMax("valueY")) + radius.normal - (height/(2*moveUpFactor));
+    x = scaleX(0.3) + 180;
+    y = height - 200;
   }
 
   if (svg.selectAll("#delta-logo").size() == 0) {
@@ -343,7 +337,7 @@ function endValues() {
       .attr("x", x - 120)
       .attr("y", y + 100)
       .style("font-size", "0px")
-      .text("40%")
+      .text("2x")
       .transition().delay(delay*50).duration(duration/3).ease(d3.easeExpOut)
         .style("font-size", "34px")
   }
@@ -351,7 +345,7 @@ function endValues() {
 
 function highlightEnd() {
   let x = scaleX(x1Max) - radius.normal;
-  let y = scaleY(Math.min(y1, y2)) - radius.normal - (height/moveUpFactor);
+  let y = scaleY(Math.max(y1, y2)) - radius.normal - (height/moveUpFactor);
   let rectWidth = 2 * radius.normal;
   let rectHeight = Math.abs(scaleY(y1) - scaleY(y2)) + (2 * radius.normal);
 

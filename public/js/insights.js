@@ -113,7 +113,7 @@ function showNavbar() {
 }
 
 function hideNavbar() {
-    if (false) {
+    if (mobile) {
         nav.style.top = -navHeight + "px";
         nav.style.opacity = 0;
     }

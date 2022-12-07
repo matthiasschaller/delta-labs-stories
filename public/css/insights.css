@@ -14,9 +14,13 @@ nav {
     right: 0;
     justify-content: space-between;
     align-items: center;
-    background-color: white;
+    background-color: transparent;
     padding:10px;
     z-index:10;
+}
+
+#nav-left {
+    background-color: white;
 }
 
 .nav-title {
@@ -86,4 +90,20 @@ a.insights-btn:hover {
 #fp-nav ul li .fp-tooltip {
     color: black !important;
     font-family: 'Montserrat', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+.bubble.gender {
+    /* transition: all 1s cubic-bezier(0.075, 0.82, 0.165, 1); */
+}
+
+.bubble.male.gender {
+    fill: blue;
+}
+
+.bubble.female.gender {
+    fill: pink;
+}
+
+.bubble.other.gender {
+    fill: gray;
 }

@@ -1,9 +1,18 @@
 let fontSize = 16;
 let lineWidth = 100;
 let dxdy = { 
-  "1": {"x": 30, "y": 30},
-  "2": {"x": -30, "y": 30} 
+  "1": {"x": -30, "y": 30},
+  "2": {"x": 30, "y": 30} 
 };
+
+if (mobile) {
+  dxdy = { 
+    "1": {"x": -10, "y": 10},
+    "2": {"x": 10, "y": 10} 
+  };
+  fontSize = 12;
+  lineWidth = 60;
+}
 
 function generateAnnotationLineWidth(id) {
   let thisLineWidth = lineWidth;
@@ -23,7 +32,7 @@ function initAnnotation(id, title, label) {
         y = calcBubblesY(n-1, "right") + radius.normal + pad;
     }
 
-    thisLineWidth = generateAnnotationLineWidth(id);
+    let thisLineWidth = generateAnnotationLineWidth(id);
 
     let annotation = svg.append("g").attr("id", "annotation-" + id);
     annotation.append("line")
@@ -69,10 +78,10 @@ function initAnnotation(id, title, label) {
 
 function moveAnnotationToStart(id) {
     if (id == "1") {
-        x = calcBubblesX(0, "left") + radius.normal + pad;
+        x = calcBubblesX(n-1, "left") - radius.normal - pad;
         y = calcBubblesY(n-1, "left") + radius.normal + pad;
     } else {
-        x = calcBubblesX(n-1, "right") - radius.normal - pad;
+        x = calcBubblesX(0, "right") + radius.normal + pad;
         y = calcBubblesY(n-1, "right") + radius.normal + pad;
     }
 
@@ -157,11 +166,11 @@ function expandAnnotation(id, top) {
     offSet = 10;
   }
 
-  let yLine = scaleY(getMax("valueY", "machinelike")) + radius.normal + connectorLength - (height/moveUpFactor);
+  let yLine = scaleY(getMax("valueY", "humanlike")) + radius.normal + connectorLength - (height/moveUpFactor);
   let xEdge = scaleX((n-1) / n) - radius.small - pad - connectorLength;
   let xEnd = scaleX(getMax("valueX")) - (width/4);
   if (mobile) {
-    xEnd = scaleX(0)-10;
+    xEnd = scaleX(0.3);
   }
 
   svg.select("#annotation-" + id)
@@ -185,11 +194,11 @@ function expandAnnotation(id, top) {
           standardAnnotation = false;
         });
 
-  svg.select("#annotation-" + id + "-label")
-    .attr("x", xEnd)
-    .attr("y", yLine + offSet)
-    .transition().duration(duration).delay((delay*70) + duration).ease(d3.easeBack)
-      .style("font-size", fontSize + "px")
+  // svg.select("#annotation-" + id + "-label")
+  //   .attr("x", xEnd)
+  //   .attr("y", yLine + offSet)
+  //   .transition().duration(duration).delay((delay*70) + duration).ease(d3.easeBack)
+  //     .style("font-size", fontSize + "px")
 
   svg.select("#annotation-" + id + "-line")
     .transition().duration(duration).delay(delay*50).ease(d3.easeBack)
