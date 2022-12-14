@@ -19,7 +19,7 @@ function initStep1() {
     
         singleRect.append("rect")
             .attr("id", "single-rect-red")
-            .attr('fill', colors[0])
+            .attr('fill', colors[3])
             .attr("x", getRectPositionX(0) - 0.5 * rectWidth)
             .attr("y", getRectPositionY(0) - 0.5 * rectWidth)
             .attr("width", (10 * rectWidth) + (10 * pad))
@@ -92,7 +92,7 @@ function initStep1() {
             })
             .attr('width', 0)
             .attr('height', 0)
-            .attr('fill', d => { return colors[0] })
+            .attr('fill', d => { return colors[3] })
 
         svg.append("line")
             .attr("id", "rect-annotation-horizontal")
@@ -157,6 +157,7 @@ function initStep1() {
 function resetToOriginalRect() {
     svg.selectAll('.firstRects')
     .transition().duration(duration.normal).delay(0).ease(d3.easeExpOut)
+        .attr('fill', d => { return colors[3] })
         .attr('x', d => {
             return getRectPositionX(d.x)
         })
@@ -278,8 +279,12 @@ function growToSingleRect() {
 
     svg.select("#single-rect-red")
         .attr("opacity", 0)
+        .attr('fill', colors[3])
         .transition().duration(duration.short).delay(duration.normal).ease(d3.easeExpOut)
             .attr("opacity", 1)
+
+    svg.selectAll(".firstRects")
+        .attr('fill', colors[3])
     
 }
 
@@ -311,7 +316,7 @@ function redoGrow(step) {
     let child1 = "100";
     let child2 = "100 presents";
     let childTotal = "10.000 presents";
-    svg.selectAll(".firstRects.green").attr('fill', colors[0]);
+    svg.selectAll(".firstRects").attr('fill', colors[3-step]);
     svg.select("#single-rect-vertical").attr("opacity", 0);
     svg.select("#single-rect-horizontal").attr("opacity", 0);
 
@@ -347,6 +352,7 @@ function redoGrow(step) {
             .attr("width", rectWidth)
             .attr("height", rectWidth)
             .transition().duration(duration.short).delay(duration.normal).ease(d3.easeExpOut)   
+                .attr("fill", colors[3-step])
                 .attr("width", (10 * rectWidth) + (10 * pad))
                 .attr("height", (10 * rectWidth) + (10 * pad)) 
                 .attr("opacity", 1)

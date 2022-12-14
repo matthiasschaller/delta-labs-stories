@@ -84,8 +84,8 @@ function step2sub3() {
 
     secondDonut();
     svg.select("#count-up-clock")
+        .attr("y", height/2)
         .style("font-size", width/10 + "px")
-        .attr("transform", "translate(0,0)")
         .transition().tween("text", function() {
             var selection = d3.select(this);
             var start = 24;
@@ -136,41 +136,30 @@ function secondDonut() {
 }
 
 function step2sub4() {
-    let yLine = height/2 - (fontSize * 12) - 10;
-    let yTotals = height/2 - (fontSize1 * 10) - 20;
-    let translateClock = ((height/2) - (fontSize * 8.5));
+    let yLine = height/4;
+    let yTotals = height/4 - (fontSize1 * 2) - 10;
     if (mobile) {
         yLine = 80;
         yTotals = 50;
-        translateClock = 110;
     }
     svg.selectAll(".donut-1-g")
         .attr("class", "donut-1-g transformed")
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-            .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + height/2 +") scale(0.10)")
+            .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + (height/2) +") scale(0.10)")
             .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-                .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + (translateClock - 2) + ") scale(0.12)")
+            .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + ((height/4) + (2*fontSize1)) +") scale(0.10)")
 
     svg.selectAll(".donut-2-g")
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
             .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + height/2 +") scale(0.1)")
             .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-                .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + (translateClock - 2) + ") scale(0.12)")
+                .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + ((height/4) + (2*fontSize1)) + ") scale(0.12)")
 
-    if (mobile) {
-        svg.select("#count-up-clock")
+    svg.select("#count-up-clock")
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
             .style("font-size", fontSize1 * 4 + "px")
             .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-            .attr("transform", "translate(0,0)")
-            .attr("y", 110)
-    } else {
-        svg.select("#count-up-clock")
-        .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-            .style("font-size", fontSize1 * 4 + "px")
-            .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-            .attr("transform", "translate(0,-" + (fontSize * 8) + ")")
-    }
+            .attr("y", ((height/4) + (2*fontSize1)))
     
     svg.select("#totals-100m")
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
