@@ -11,7 +11,29 @@ let earthRect = Math.sqrt(totalVol / 3012);
 let moonRect = Math.sqrt(totalVol / 314);
 
 (function () {
-
+    if (!mobile) {
+      document.getElementById("viz-container").insertAdjacentHTML("beforeend", `
+      <div class="santa-window" id="santa-window">
+      <div class="santa">
+          <div class="head">
+          <div class="face">
+              <div class="redhat">
+              <div class="whitepart"></div>
+              <div class="redpart"></div>
+              <div class="hatball"></div>
+              </div>
+              <div class="eyes"></div>
+              <div class="beard">
+              <div class="nouse"></div>
+              <div class="mouth"></div>
+              </div>
+          </div>
+          <div class="ears"></div>
+          </div>
+          <div class="body"></div>
+      </div>
+  </div>`);
+    }
     if (scrollSnap) {
       fullpage_api.getFullpageData().options.onLeave = function(origin, destination, direction, trigger) {
         scroll(scrollPosition);

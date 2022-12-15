@@ -11,7 +11,11 @@ let totalY = null;
 
 
 function initStep1() {
-    scrollDownAnimation();
+    if (mobile) {
+        scrollDownAnimation();
+    } else {
+        document.getElementById("santa-window").classList.remove("d-none");
+    }
 
     svg.select("#donut-1-g").remove();
     svg.select("#count-up-clock").remove();
@@ -210,6 +214,10 @@ function getRectPositionYFull(y) {
 function growRect() {
     keepRepeating = false;
     d3.select("#section-divider-text").style("font-size", "0px");
+
+    if (!mobile) {
+        document.getElementById("santa-window").classList.add("d-none")
+    }
 
     svg.select("#single-rect-red").transition().duration(duration.normal).delay(0).ease(d3.easeExpOut)
             .attr("opacity", 0)
