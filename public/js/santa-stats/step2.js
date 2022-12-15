@@ -1,23 +1,23 @@
-function step2sub1() {
-    svg.selectAll(".donut-1-g").remove();
-    svg.selectAll(".donut-2-g").remove();
-    svg.select("#count-up-clock").remove();
+// function step2sub1() {
+//     svg.selectAll(".donut-1-g").remove();
+//     svg.selectAll(".donut-2-g").remove();
+//     svg.select("#count-up-clock").remove();
 
-    svg.select("#section-divider-text")
-        .text("?")
-        .transition().duration(duration.normal).delay(duration.normal).ease(d3.easeBack)
-        .style("font-size", (height / 2) + "px")
+//     svg.select("#section-divider-text")
+//         .text("?")
+//         .transition().duration(duration.normal).delay(duration.normal).ease(d3.easeBack)
+//         .style("font-size", (height / 2) + "px")
     
-}
+// }
 
 function step2sub2() {
     svg.selectAll(".donut-1-g").remove();
     svg.selectAll(".donut-2-g").remove();
     svg.select("#count-up-clock").remove();
 
-    svg.select("#section-divider-text")
-        .transition().duration(duration.short).delay(0).ease(d3.easeBack)
-        .style("font-size", "0px")
+    // svg.select("#section-divider-text")
+    //     .transition().duration(duration.short).delay(0).ease(d3.easeBack)
+    //     .style("font-size", "0px")
           
     firstDonut();
     
@@ -27,8 +27,10 @@ function step2sub2() {
         .attr("y", height/2)
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
-        .style("font-size", width/10 + "px")
-        .text("0h");
+        .style("font-size", "0px")
+        .text("0h")
+        .transition().duration(duration.short).delay(duration.short)
+            .style("font-size", width/10 + "px")
     
     text.transition().tween("text", function() {
         var selection = d3.select(this);
@@ -36,10 +38,9 @@ function step2sub2() {
         var end = 24;
         var interpolator = d3.interpolateNumber(start,end); 
 
-        return function(t) { selection.text(Math.round(interpolator(t)) + "h"); };  // return value
+        return function(t) { selection.text(Math.round(interpolator(t)) + "h"); };
         
-    })
-    .duration(duration.long);
+    }).duration(duration.normal).delay(duration.normal);
         
 }
 
@@ -133,6 +134,7 @@ function secondDonut() {
     }
 
     svg.select("#stops-to-time-line").remove();
+    svg.select("#stops-per-hour").remove();
 }
 
 function step2sub4() {
@@ -147,19 +149,19 @@ function step2sub4() {
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
             .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + (height/2) +") scale(0.10)")
             .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-            .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + ((height/4) + (2*fontSize1)) +") scale(0.10)")
+            .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + ((height/4) + (2*fontSize1) + 10) +") scale(0.10)")
 
     svg.selectAll(".donut-2-g")
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
             .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + height/2 +") scale(0.1)")
             .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-                .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + ((height/4) + (2*fontSize1)) + ") scale(0.12)")
+                .attr("transform", "translate(" + (width/2 - fontSize1 * 6) + ", " + ((height/4) + (2*fontSize1) + 10) + ") scale(0.12)")
 
     svg.select("#count-up-clock")
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
             .style("font-size", fontSize1 * 4 + "px")
             .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
-            .attr("y", ((height/4) + (2*fontSize1)))
+            .attr("y", ((height/4) + (2*fontSize1) + 10))
     
     svg.select("#totals-100m")
         .transition().duration(duration.normal).delay(0).ease(d3.easeBack)
@@ -191,12 +193,6 @@ function step2sub4() {
             .attr("x2", width/2 + fontSize1 * 24)
 
     svg.select("#stops-per-hour").remove();
-}   
-
-function step2sub5() {
-    svg.select("#stops-per-minute").remove();
-    svg.select("#stops-per-hour").remove();
-
     svg.append("text")
         .attr("id", "stops-per-hour")
         .attr("x", width/2)
@@ -206,11 +202,30 @@ function step2sub5() {
         .style("font-size", fontSize1 * 2 + "px")
         .attr("opacity", 0)
         .text("0 STOPS PER HOUR")
-            .transition().duration(duration.short).delay(0).ease(d3.easeExpOut)
+            .transition().duration(duration.short).delay(duration.short).ease(d3.easeExpOut)
             .attr("opacity", 1)
 
         textTransition("stops-per-hour", 0, 3677419, duration.short, duration.normal, null, " STOPS PER HOUR")
-}
+}   
+
+// function step2sub5() {
+//     svg.select("#stops-per-minute").remove();
+//     svg.select("#stops-per-hour").remove();
+
+//     svg.append("text")
+//         .attr("id", "stops-per-hour")
+//         .attr("x", width/2)
+//         .attr("y", height/2 + (fontSize1 * 5))
+//         .attr("text-anchor", "middle")
+//         .attr("alignment-baseline", "middle")
+//         .style("font-size", fontSize1 * 2 + "px")
+//         .attr("opacity", 0)
+//         .text("0 STOPS PER HOUR")
+//             .transition().duration(duration.short).delay(0).ease(d3.easeExpOut)
+//             .attr("opacity", 1)
+
+//         textTransition("stops-per-hour", 0, 3677419, duration.short, duration.normal, null, " STOPS PER HOUR")
+// }
 
 function step2sub6() {
     svg.select("#stops-per-minute").remove();
@@ -227,7 +242,7 @@ function step2sub6() {
             .transition().duration(duration.short).delay(0).ease(d3.easeExpOut)
             .attr("opacity", 1)
 
-            textTransition("stops-per-minute", 0, 612903, duration.short, duration.normal, null, " STOPS PER MINUTE")
+            textTransition("stops-per-minute", 0, 61290, duration.short, duration.normal, null, " STOPS PER MINUTE")
 }
 
 function step2sub7() {

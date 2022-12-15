@@ -39,10 +39,10 @@ let moonRect = Math.sqrt(totalVol / 314);
 
 function scroll(scrollPosition) {
   let step1 = 0;
-  let step2 = step1 + 9;
-  let step3 = step2 + 8;
+  let step2 = step1 + 7;
+  let step3 = step2 + 7;
   let step4 = step3 + 5;
-  let step5 = step4 + 9;
+  let step5 = step4 + 5;
 
 
   console.log(scrollPosition)
@@ -56,17 +56,16 @@ function scroll(scrollPosition) {
     redoGrow(1);
   } else if (scrollPosition == step1 + 4) {
     redoGrow(2);
+  // } else if (scrollPosition == step1 + 5) {
+  //   redoGrow(3);
   } else if (scrollPosition == step1 + 5) {
-    redoGrow(3);
-  } else if (scrollPosition == step1 + 6) {
     moveFirstRectToTop();
-  } else if (scrollPosition == step1 + 7) {
-    fifteenPercent();
-  } else if (scrollPosition == step1 + 8) {
+  // } else if (scrollPosition == step1 + 6) {
+  //   fifteenPercent();
+  } else if (scrollPosition == step1 + 6) {
     nStops();
   } else if (scrollPosition == step2) {
-      moveStopsDown();
-      step2sub1();
+    moveStopsDown();
   } if (scrollPosition == step2 + 1) {
     step2sub2();
   } else if (scrollPosition == step2 + 2) {
@@ -74,14 +73,12 @@ function scroll(scrollPosition) {
   } else if (scrollPosition == step2 + 3) {
     step2sub4();
   } else if (scrollPosition == step2 + 4) {
-    step2sub5();
-  } else if (scrollPosition == step2 + 5) {
     step2sub6();
-  } else if (scrollPosition == step2 + 6) {
+  } else if (scrollPosition == step2 + 5) {
     step2sub7();
-  } else if (scrollPosition == step2 + 7) {
+  } else if (scrollPosition == step2 + 6) {
     step2sub8();
-  }
+  } 
 
   if (scrollPosition == step3) {
       step3sub1();
@@ -105,16 +102,6 @@ function scroll(scrollPosition) {
     step4sub4();
   } else if (scrollPosition == step4 + 4) {
     step4sub5();
-  }
-
-  if (scrollPosition == step4 + 5) {
-    null;
-  } else if (scrollPosition == step4 + 6) {
-    null;
-  } else if (scrollPosition == step4 + 7) {
-    null;
-  } else if (scrollPosition == step4 + 8) {
-    step5pre();
   }
 
   if (scrollPosition == step5) {

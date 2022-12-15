@@ -1,8 +1,3 @@
-let padX = 100;
-if (mobile) {
-    padX = 10;
-}
-
 function step3sub1() {
     keepRepeating = false;
     svg.select("#section-divider-text").style("font-size", "0px");

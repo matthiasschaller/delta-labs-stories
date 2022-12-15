@@ -144,6 +144,7 @@ function speedAddBar(text, value) {
 }
 
 function step4sub5() {
+    svg.select("#wordcloud-g").remove();
     showAllStep4(0);
     if (keepRepeating) {
         keepRepeating = false;
