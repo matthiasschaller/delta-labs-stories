@@ -64,10 +64,19 @@ a.insights-btn:hover {
     }
 }
 
+#left-container {
+  max-width: 100%;
+}
+
 @media screen and (min-width: 501px) {
     .hide-desktop {
       display: none;
     }
+
+    #left-container {
+      max-width: 30%;
+    }
+    
 }
 
 .animatedTransition {
@@ -85,12 +94,14 @@ a.insights-btn:hover {
     max-width: 100% !important;
     padding-left: 1rem;
     padding-right: 1rem;
+    font-size: 1.2rem;
 }
 
 .step-p {
-    padding-left: 2rem;;
-    padding-right: 2rem;
+    padding-left: 1rem;;
+    padding-right: 1rem;
     transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+    font-size: 1.4vw;
 }
 
 #fp-nav ul li .fp-tooltip {
@@ -109,31 +120,21 @@ a.insights-btn:hover {
 .bubble.other.gender {
     fill: gray;
 }
-
-
-
-::selection {
-    background: rgba(255,255,0,0.5);
-  }
-  
-  body {
-    background: #CC231E; }
   
   .santa-window {
     width: 340px;
     height: 340px;
-    background: #235E6F;
+    background: #0F8A5F;
     position: absolute;
     top: 50%;
     left: 65%;
     border-radius: 50%;
-    margin-top: -60px;
     -webkit-transform: translate(-50%, -50%);
     -moz-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     -o-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    border: 10px solid #f8e7dc;
+    /* border: 10px solid #f8e7dc; */
     overflow: hidden; }
   
   .santa {

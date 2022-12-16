@@ -89,7 +89,8 @@ function checkMobile() {
         document.querySelector("#viz-svg").classList.remove("mobile");
         for (const step of document.querySelectorAll(".step-p")) {
             step.classList.remove('mobile');
-            step.style.marginTop = "0px";
+            step.style.marginTop = navHeight + "px";
+            step.style.marginBottom = "0px";
         }
         for (const step of document.querySelectorAll(".step")) {
             step.style.alignItems = "center";

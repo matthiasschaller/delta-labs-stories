@@ -1,5 +1,8 @@
 let colors = ["#CC231E", "#0F8A5F", "#34A65F", "#F5624D", "#235E6F"];
-let rectWidth = width / 30;
+let rectWidth = width * height / 40000;
+if (mobile) {
+  rectWidth =width * height / 15000;
+}
 let pad = 4;
 let scrollStops = [1, 2, 3, 4, 5];
 let duration = { normal: 500, long: 900, short: 250};
@@ -65,7 +68,6 @@ function scroll(scrollPosition) {
   let step3 = step2 + 7;
   let step4 = step3 + 5;
   let step5 = step4 + 5;
-
 
   console.log(scrollPosition)
   if (scrollPosition == step1) {
