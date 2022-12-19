@@ -36,13 +36,13 @@ app.get("/insights-template-snap", function (req, res) {
 app.get("/insights-template", function (req, res) {
     let sections = ["Section 0 - Setup", "Section 1 - Demographics", "Section 2 - Attitudes", "Section 3 - Wordcloud", "Section 4 - Massnahmen", "Section 5 - Simple Bars", "Section 6 - Rank Order"];
 
-    res.render("insights-template",  { title: "The Insights Template", sections: sections, scrollSnap: false });
+    res.render("insights-template",  { title: "The Insights Template", sections: sections, scrollSnap: false, navigationTooltips: [] });
 });
 
 app.get("/privacy-paradox", function (req, res) {
-    let sections = ["Section 0 - Setup", "Section 1 - Demographics", "Section 2 - Attitudes", "Section 3 - Wordcloud", "Section 4 - Massnahmen", "Section 5 - Simple Bars", "Section 6 - Rank Order"];
+    let sections = ["Section 0 - Setup", "Section 1a - Demographics", "Section 1b - Age", "Section 1c - Education", "Section 2 - Attitudes", "Section 3 - Wordcloud", "Section 4 - Massnahmen", "Section 5 - Simple Bars", "Section 6 - Rank Order"];
 
-    res.render("insights-template",  { title: "The Privacy Paradox", sections: sections, scrollSnap: false, scriptFolder: "privacy-paradox", scripts: ["privacy-paradox"], navigationTooltips: []  });
+    res.render("insights-template",  { title: "The Privacy Paradox", sections: sections, scrollSnap: false, scriptFolder: "privacy-paradox", scripts: ["bar-chart", "privacy-paradox"], navigationTooltips: []  });
 });
 
 app.get("/santa-stats", function (req, res) {

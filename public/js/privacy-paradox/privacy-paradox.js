@@ -1,5 +1,5 @@
 let data = [];
-let sectionLabels = ["start", "gender"];
+let sectionLabels = ["start", "gender", "age", "education"];
 let bubbles;
 let radius = 15;
 let pad = 5;
@@ -10,6 +10,19 @@ let n = 100;
 
 let scaleX = d3.scaleLinear().domain([0, 1]).range([padding, width-padding]);
 let scaleY = d3.scaleLinear().domain([0, 1]).range([padding + navHeight, height-padding]);
+
+let palette = ["#212529", "#E9ECEF", "#495057", "#CED4DA", "#ADB5BD"]
+let datacolors = { 
+        gender: { male: palette[0], female: palette[1], other: palette[2] },
+        age: { 1: palette[0], 2: palette[1], 3: palette[2], 4: palette[3], 5: palette[4] },
+        education: { 1: palette[0], 2: palette[1], 3: palette[2], 4: palette[3], 5: palette[4] }
+    };
+
+let datalabels = { 
+    gender: { male: "male", female: "female", other: "other"},
+    age: { 1: "below 18", 2: "18 to 39", 3: "40-59", 4: "60-79", 5: "80 and up" },
+    education: { 1: "none", 2: "highschool", 3: "bachelor", 4: "master" }
+    };
 
 (function () {
     if (scrollSnap) {
@@ -28,15 +41,14 @@ let scaleY = d3.scaleLinear().domain([0, 1]).range([padding + navHeight, height-
 }());
 
 function scroll(pos) {
-    //console.log(pos)
-    if (pos < 1) {
-        showDots();
-    } else if (pos < 2) {
-        showDescriptives("gender");
-    }
+    showDots(0);
+    showBars("gender", 1);
+    showBars("age", 2);
+    showBars("education", 3);
 }
 
 function initData() {
+
     for (let x = 1; x <= n; x++) {
         let gender = "male";
         let random = Math.random();
@@ -46,43 +58,45 @@ function initData() {
             gender = "other";
         }
 
+        let age = "1";
+        random = Math.round(Math.random() * 100) / 100;
+        if (random >= 0.2 && random < 0.4) {
+            age = "2";
+        } else if (random >= 0.4 && random < 0.7) {
+            age = "3";
+        } else if (random >= 0.7 && random < 0.9) {
+            age = "4";
+        } else if (random >= 0.9) {
+            age = "5";
+        }
+
+
+        let education = "1";
+        random = Math.random();
+        if (random > 0.2 && random < 0.4) {
+            education = "2";
+        } else if (random > 0.4 && random < 0.7) {
+            education = "3";
+        } else if (random > 0.7 ) {
+            education = "4"
+        }
+
         let delay = Math.random();
-        data.push({ id: x, gender: gender, delay: delay, positions: { 
-            start: { cx: null, cy: null },
-            gender: { cx: null, cy: null },
-        } });
+        data.push({ id: x, gender: gender, age: age, education: education, delay: delay, 
+            positions: { 
+                start: { cx: null, cy: null },
+                gender: { cx: null, cy: null },
+                age: { cx: null, cy: null },
+                education: { cx: null, cy: null },
+            }, 
+            color: {},
+            label: {}
+        });
     }
 
-    initDescriptiveData("gender");
-    initDescriptivesLabels("gender");
-    initDescriptivesValues("gender");
-}
-
-function initDescriptiveData(label) {
-    let x = getXPosBars(label);
-
-    let y = scaleY(0.8);
-
-    data.forEach(d => {
-        d.positions[label].cx = x[d[label]].pos + ((x[d[label]].counter % circlesPerBarWidth) * ((2*radius) + pad));
-        d.positions[label].cy = y - (Math.floor(x[d[label]].counter / circlesPerBarWidth) * ((2*radius) + pad))
-        x[d[label]].counter = x[d[label]].counter + 1;
-    });
-}
-
-function getXPosBars(label) {
-    let x = {};
-
-    let categories = getCategories(label);
-
-    let barPad = ((width / categories.length) - (circlesPerBarWidth * ((2*radius) + pad))) / 2;
-    categories.forEach(function(cat, index) {
-        x[cat] = {};
-        x[cat].pos = barPad + (index * width / categories.length)
-        x[cat].counter = 0;
-    });
-
-    return x;
+    initBarData("gender");
+    initBarData("age");
+    initBarData("education");
 }
 
 function getCategories(label) {
@@ -104,14 +118,16 @@ function initDots() {
     storePositions("start");
 }
 
-function showDots() {
+function showDots(section) {
     let delayDenom = 1.5;
-    bubbles.attr("r",function(d) {
-        if (scrollPosition > (d.delay / delayDenom)) {
-            let thisRadius = Math.min(radius, (scrollPosition - (d.delay / delayDenom)) * 100);
-            return thisRadius;
-        }
-    });
+    if (scrollPosition < (section + 1)) {
+        bubbles.attr("r",function(d) {
+            if (scrollPosition > (d.delay / delayDenom)) {
+                let thisRadius = Math.min(radius, (scrollPosition - (d.delay / delayDenom)) * 100);
+                return thisRadius;
+            }
+        });
+    }
 }
 
 function randn_bm() {
@@ -124,107 +140,11 @@ function randn_bm() {
     return num
 }
 
-function showDescriptives(label) {
-    let sectionIndex = sectionLabels.indexOf(label);
-    let localPosition = scrollPosition - sectionIndex;
-
-    colorDots(localPosition, label);
-
-    let movementDuration = 0.25;
-    bubbles
-        .attr("cx", function(d) {
-            let delay = ((d.id / n) / 5) + 0.25;
-            if (localPosition >= delay) {
-                let progress = Math.min((localPosition - delay) / movementDuration, 1);
-                return ((progress * d.positions[label].cx) + ((1-progress) * d.positions[sectionLabels[sectionIndex-1]].cx))
-            } else {
-                return (d.positions[sectionLabels[sectionIndex-1]].cx)
-            }
-        })
-        .attr("cy", function(d) {
-            let delay = ((d.id / n) / 5) + 0.25;
-            if (localPosition >= delay) {
-                let progress = Math.min((localPosition - delay) / movementDuration, 1);
-                return ((progress * d.positions[label].cy) + ((1-progress) * d.positions[sectionLabels[sectionIndex-1]].cy))
-            } else {
-                return d.positions[sectionLabels[sectionIndex-1]].cy
-            }
-        })
-    
-    showDecriptiveLabels(label, localPosition);
-    showDecriptiveValues(label, localPosition);
-
-}
-
-function initDescriptivesLabels(label) {
-    let categories = getCategories(label);
-    let x = getXPosBars(label);
-
-
-    categories.forEach(function(cat, index) {
-        svg.append("text")
-            .text(cat)
-            .attr("id", "desc-" + cat + "-label")
-            .attr("text-anchor", "middle")
-            .attr("x", x[cat].pos + ((circlesPerBarWidth * radius * 2) / 2) - pad)
-            .attr("y", scaleY(0.8) + (2 * radius) + pad + 10)
-            .style("font-size", "0px")
-    });
-}
-
-function initDescriptivesValues(label) {
-    let totals = calculateTotals(label);
-    let categories = getCategories(label);
-    let x = getXPosBars(label);
-
-    categories.forEach(function(cat, index) {
-        svg.append("text")
-            .text(Math.round((totals[cat] / n) * 100) + "%")
-            .attr("id", "desc-" + cat + "-value")
-            .attr("text-anchor", "middle")
-            .attr("x", x[cat].pos + ((circlesPerBarWidth * radius * 2) / 2) - pad)
-            .attr("y", scaleY(0.8) - (Math.ceil(totals[cat] / circlesPerBarWidth) * (2 * radius + pad)) - pad - 10)
-            .style("font-size", "0px")
-    });
-}
-
-function showDecriptiveLabels(label, localPosition) {
-    let categories = getCategories(label);
-    let movementDuration = 0.25;
-    categories.forEach(function(cat, index) {
-        svg.select("#desc-" + cat + "-label")
-            .style("font-size", function(d) {
-                if (localPosition >= 0.5) {
-                    let progress = Math.min((localPosition - 0.5) / movementDuration, 1);
-                    return (Math.round(progress * fontSize.normal) + "px")
-                } else {
-                    return (0 + "px")
-                }
-            });
-    });
-}
-
-function showDecriptiveValues(label, localPosition) {
-    let categories = getCategories(label);
-    let movementDuration = 0.25;
-    categories.forEach(function(cat, index) {
-        svg.select("#desc-" + cat + "-value")
-            .style("font-size", function(d) {
-                if (localPosition >= 0.5) {
-                    let progress = Math.min((localPosition - 0.5) / movementDuration, 1);
-                    return (Math.round(progress * fontSize.large) + "px")
-                } else {
-                    return (0 + "px")
-                }
-            });
-    });
-}
-
 function colorDots(localPosition, label) {
     let delayDenom = 5;
-    bubbles.attr("class", function(d) {
+    bubbles.style("fill", function(d) {
         if (localPosition > (d.delay / delayDenom)) {
-            return "bubble " + label + " " + d.gender;
+            return "bubble " + label + " " + d[label];
         } else {
             return "bubble " + d[label];
         }
@@ -249,4 +169,8 @@ function storePositions(section) {
         d.positions[section].cx = d3.select("#bubble-" + d.id).attr("cx");
         d.positions[section].cy = d3.select("#bubble-" + d.id).attr("cy");
     });
+}
+
+function checkSection(section) {
+    return (scrollPosition >= section && scrollPosition < (section + 1));
 }
